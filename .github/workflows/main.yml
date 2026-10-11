@@ -1,0 +1,57 @@
+name: Gerar app Android (Foco Fofo)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Montar a pasta www
+        run: npm run build:www
+
+      - name: Criar o projeto Android
+        run: npx cap add android
+
+      - name: Gerar ícones e tela de abertura
+        run: npx capacitor-assets generate --android
+
+      - name: Número da versão
+        run: |
+          sed -i "s/versionCode [0-9]\+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
+          grep -n "targetSdkVersion\|compileSdkVersion\|minSdkVersion" android/variables.gradle || true
+
+      - name: Sincronizar
+        run: npx cap sync android
+
+      - name: APK de teste
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Pacote da Play Store (AAB) assinado
+        if: env.KS_B64 != ''
+        working-directory: android
+        run: |
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
