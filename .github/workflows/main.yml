@@ -55,3 +55,21 @@ jobs:
         working-directory: android
         run: |
           echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+          ./gradlew bundleRelease
+          AAB=$(find app/build/outputs/bundle/release -name "*.aab" | head -n 1)
+          jarsigner -keystore "$RUNNER_TEMP/release.keystore" -storepass "$KS_PASS" -keypass "$KEY_PASS" \
+            -sigalg SHA256withRSA -digestalg SHA-256 "$AAB" "$KEY_ALIAS"
+          cp "$AAB" "$GITHUB_WORKSPACE/foco-fofo-release.aab"
+
+      - name: Guardar o APK de teste
+        uses: actions/upload-artifact@v4
+        with:
+          name: foco-fofo-apk-teste
+          path: android/app/build/outputs/apk/debug/*.apk
+
+      - name: Guardar o AAB da Play Store
+        if: env.KS_B64 != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: foco-fofo-aab-play-store
+          path: foco-fofo-release.aab
