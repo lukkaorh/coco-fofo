@@ -1,0 +1,22 @@
+{
+  "name": "foco-fofo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Foco Fofo: cronômetro, timer e conquistas (app Android com Capacitor)",
+  "scripts": {
+    "build:www": "node scripts/prepare-www.mjs",
+    "android:add": "cap add android",
+    "android:assets": "capacitor-assets generate --android",
+    "android:sync": "npm run build:www && cap sync android",
+    "android:open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/core": "latest",
+    "@fontsource/fredoka": "latest"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "latest",
+    "@capacitor/cli": "latest"
+  }
+}

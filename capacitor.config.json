@@ -1,0 +1,9 @@
+{
+  "appId": "com.focofofo.app",
+  "appName": "Foco Fofo",
+  "webDir": "www",
+  "backgroundColor": "#F1D9E6",
+  "android": {
+    "backgroundColor": "#F1D9E6"
+  }
+}
