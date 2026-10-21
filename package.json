@@ -8,11 +8,14 @@
     "android:add": "cap add android",
     "android:assets": "capacitor-assets generate --android",
     "android:sync": "npm run build:www && cap sync android",
-    "android:open": "cap open android"
+    "android:open": "cap open android",
+    "capacitor:sync:after": "node scripts/patch-android.mjs"
   },
   "dependencies": {
     "@capacitor/android": "latest",
     "@capacitor/core": "latest",
+    "@capacitor/filesystem": "latest",
+    "@capacitor/share": "latest",
     "@fontsource/fredoka": "latest"
   },
   "devDependencies": {
